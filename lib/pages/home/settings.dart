@@ -480,6 +480,28 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   pref: stows.editorPromptRename,
                 ),
+                SettingsDropdown<StylusButtonAction>(
+                  title: 'Stylus primary button',
+                  subtitle: 'Action performed while hovering',
+                  icon: Icons.radio_button_checked,
+                  pref: stows.stylusPrimaryButtonAction,
+                  options: const [
+                    ToggleButtonsOption(StylusButtonAction.none, Text('None')),
+                    ToggleButtonsOption(StylusButtonAction.eraser, Text('Eraser')),
+                    ToggleButtonsOption(StylusButtonAction.select, Text('Lasso')),
+                  ],
+                ),
+                SettingsDropdown<StylusButtonAction>(
+                  title: 'Stylus secondary button',
+                  subtitle: 'Action performed while hovering',
+                  icon: Icons.radio_button_unchecked,
+                  pref: stows.stylusSecondaryButtonAction,
+                  options: const [
+                    ToggleButtonsOption(StylusButtonAction.none, Text('None')),
+                    ToggleButtonsOption(StylusButtonAction.eraser, Text('Eraser')),
+                    ToggleButtonsOption(StylusButtonAction.select, Text('Lasso')),
+                  ],
+                ),
                 SettingsSwitch(
                   title: t.settings.prefLabels.recentColorsDontSavePresets,
                   icon: Icons.palette,

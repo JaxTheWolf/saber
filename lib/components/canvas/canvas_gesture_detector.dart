@@ -53,7 +53,10 @@ class CanvasGestureDetector extends StatefulWidget {
   updatePointerData;
   final VoidCallback onHovering;
   final VoidCallback onHoveringEnd;
-  final ValueChanged<bool> onStylusButtonChanged;
+  /// Receives the `PointerEvent.buttons` bitmask for stylus buttons.
+  /// The caller can test bits such as `kPrimaryStylusButton` and
+  /// `kSecondaryStylusButton`.
+  final ValueChanged<int> onStylusButtonChanged;
 
   final VoidCallback undo;
   final VoidCallback redo;
@@ -443,7 +446,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     }
   }
 
-  var stylusButtonWasPressed = false;
+  int _stylusButtonsPrevious = 0;
 
   void _listenerPointerHoverEvent(PointerEvent event) {
     if (event.kind != PointerDeviceKind.stylus) return;
@@ -454,17 +457,18 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
       widget.onHoveringEnd();
     } else {
       widget.onHovering();
-      if (stylusButtonWasPressed != (event.buttons == kPrimaryStylusButton)) {
-        stylusButtonWasPressed = event.buttons == kPrimaryStylusButton;
-        widget.onStylusButtonChanged(stylusButtonWasPressed);
+      final int buttons = event.buttons;
+      if (_stylusButtonsPrevious != buttons) {
+        _stylusButtonsPrevious = buttons;
+        widget.onStylusButtonChanged(buttons);
       }
     }
   }
 
   void _listenerPointerUpEvent(PointerEvent event) {
     widget.updatePointerData(event.kind, null);
-    stylusButtonWasPressed = false;
-    widget.onStylusButtonChanged(false);
+    _stylusButtonsPrevious = 0;
+    widget.onStylusButtonChanged(0);
   }
 
   @override

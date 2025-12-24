@@ -741,18 +741,45 @@ class EditorState extends State<Editor> {
     isHovering = false;
   }
 
-  void onStylusButtonChanged(bool buttonPressed) {
+  void onStylusButtonChanged(int buttons) {
+    final bool anyPressed = buttons != 0;
     // whether the stylus button is or was pressed
-    stylusButtonPressed = stylusButtonPressed || buttonPressed;
+    stylusButtonPressed = stylusButtonPressed || anyPressed;
 
     if (isHovering) {
-      if (buttonPressed) {
-        if (currentTool is Eraser) return;
-        tmpTool = currentTool;
-        currentTool = Eraser();
-        setState(() {});
+      final primaryPressed = (buttons & kPrimaryStylusButton) != 0;
+      final secondaryPressed = (buttons & kSecondaryStylusButton) != 0;
+
+      // Resolve configured actions
+      final primaryAction = stows.stylusPrimaryButtonAction.value;
+      final secondaryAction = stows.stylusSecondaryButtonAction.value;
+
+      void performAction(StylusButtonAction action) {
+        switch (action) {
+          case StylusButtonAction.eraser:
+            if (currentTool is Eraser) return;
+            if (tmpTool == null) tmpTool = currentTool;
+            currentTool = Eraser();
+            setState(() {});
+            break;
+          case StylusButtonAction.select:
+            if (currentTool is Select) return;
+            if (tmpTool == null) tmpTool = currentTool;
+            currentTool = Select.currentSelect;
+            setState(() {});
+            break;
+          case StylusButtonAction.none:
+            break;
+        }
+      }
+
+      // Primary has priority if pressed
+      if (primaryPressed) {
+        performAction(primaryAction);
+      } else if (secondaryPressed) {
+        performAction(secondaryAction);
       } else {
-        if (tmpTool != null && currentTool is Eraser) {
+        if (tmpTool != null && (currentTool is Eraser || currentTool is Select)) {
           currentTool = tmpTool!;
           tmpTool = null;
           setState(() {});

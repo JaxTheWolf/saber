@@ -20,6 +20,9 @@ import 'package:stow_codecs/stow_codecs.dart';
 import 'package:stow_plain/stow_plain.dart';
 import 'package:stow_secure/stow_secure.dart';
 
+/// Actions that can be performed by stylus buttons.
+enum StylusButtonAction { none, eraser, select }
+
 /// If false, all stows are stuck at their default values.
 var _isOnMainIsolate = false;
 
@@ -392,6 +395,22 @@ class Stows {
     'sentryConsent',
     SentryConsent.unknown,
     codec: SentryConsent.codec,
+    volatile: !_isOnMainIsolate,
+  );
+
+  static const _stylusButtonActionValues = StylusButtonAction.values;
+
+  final stylusPrimaryButtonAction = PlainStow<StylusButtonAction>(
+    'stylusPrimaryButtonAction',
+    StylusButtonAction.eraser,
+    codec: EnumCodec(_stylusButtonActionValues),
+    volatile: !_isOnMainIsolate,
+  );
+
+  final stylusSecondaryButtonAction = PlainStow<StylusButtonAction>(
+    'stylusSecondaryButtonAction',
+    StylusButtonAction.select,
+    codec: EnumCodec(_stylusButtonActionValues),
     volatile: !_isOnMainIsolate,
   );
 
